@@ -1,0 +1,82 @@
+name: CI
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  # 1) 主机端：用 gcc 构建并运行全部可运行示例
+  build-and-run:
+    name: Build & run (host gcc)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install toolchain
+        run: sudo apt-get update && sudo apt-get install -y build-essential
+
+      - name: Compiler version
+        run: gcc --version
+
+      - name: Build all examples (-Wall -Wextra)
+        run: make all
+
+      - name: Run all examples
+        run: make run
+
+  # 2) 静态分析：cppcheck（硬门禁）+ clang-tidy（信息性）
+  static-analysis:
+    name: Static analysis
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install analyzers
+        run: sudo apt-get update && sudo apt-get install -y cppcheck clang-tidy
+
+      - name: cppcheck
+        run: |
+          cppcheck --enable=warning,performance,portability \
+                   --std=c11 --language=c \
+                   --inline-suppr \
+                   --suppressions-list=.cppcheck-suppressions \
+                   --error-exitcode=1 \
+                   -i docs -i 19-arm-firmware-stm32 \
+                   .
+
+      - name: clang-tidy (informational)
+        continue-on-error: true
+        run: |
+          find . -path ./docs -prune -o -name '*.c' -print \
+            | grep -v 19-arm-firmware-stm32 \
+            | while read -r f; do
+                echo "== $f =="
+                clang-tidy --config-file=18-code-quality/.clang-tidy "$f" -- -std=c11 -I"$(dirname "$f")" || true
+              done
+
+  # 3) 真机固件：用 arm-none-eabi-gcc 交叉编译 STM32 固件
+  build-firmware:
+    name: Build STM32 firmware (arm-none-eabi-gcc)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install ARM toolchain
+        run: sudo apt-get update && sudo apt-get install -y gcc-arm-none-eabi
+
+      - name: Toolchain version
+        run: arm-none-eabi-gcc --version
+
+      - name: Build firmware (elf/bin/hex + size)
+        run: make -C 19-arm-firmware-stm32
+
+      - name: Upload firmware artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: stm32f103-blinky
+          path: |
+            19-arm-firmware-stm32/blinky.elf
+            19-arm-firmware-stm32/blinky.bin
+            19-arm-firmware-stm32/blinky.hex

@@ -1,52 +1,51 @@
-# Prerequisites
-*.d
-
-# Object files
+# 编译产物
 *.o
-*.ko
 *.obj
 *.elf
-
-# Linker output
-*.ilk
-*.map
-*.exp
-
-# Precompiled Headers
-*.gch
-*.pch
-
-# Libraries
-*.lib
-*.a
-*.la
-*.lo
-
-# Shared objects (inc. Windows DLLs)
-*.dll
-*.so
-*.so.*
-*.dylib
-
-# Executables
-*.exe
-*.out
-*.app
-*.i*86
-*.x86_64
+*.bin
 *.hex
+*.map
+*.a
+*.so
+*.exe
 
-# Debug files
-*.dSYM/
-*.su
-*.idb
-*.pdb
+# 生成的可执行文件（无扩展名，逐目录列出常见名）
+**/uninitialized_ub
+**/fixed_initialized
+**/lexical_traps
+**/semantic_traps_1
+**/semantic_traps_2
+**/syntax_traps
+**/macro_pitfalls
+**/pp_demo
+**/library_traps
+**/linker_demo
+**/portability_traps
+**/fsm_switch
+**/fsm_table
+**/led_fsm
+**/startup_sim
+**/interrupt_demo
+**/hardfault_coredump
+**/super_loop
+**/foreground_background
+**/event_driven
+**/layered
+**/rtos_demo
+**/i2c_demo
+**/bisect_demo
+**/*_demo
 
-# Kernel Module Compile Results
-*.mod*
-*.cmd
-.tmp_versions/
-modules.order
-Module.symvers
-Mkfile.old
-dkms.conf
+# 临时/编辑器
+*.log
+*.tmp
+.DS_Store
+.vscode/
+.idea/
+
+# ARM 固件构建产物
+19-arm-firmware-stm32/*.o
+19-arm-firmware-stm32/*.elf
+19-arm-firmware-stm32/*.bin
+19-arm-firmware-stm32/*.hex
+19-arm-firmware-stm32/*.map

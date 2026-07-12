@@ -1,0 +1,17 @@
+# clang-format 配置示例（嵌入式 C，风格接近 LLVM/Linux 折中）
+# 对应文章：《还在996？教你五招，代码质量飞升……》第四招"代码格式化"
+# 用法： clang-format -i your_file.c
+---
+Language: Cpp
+BasedOnStyle: LLVM
+IndentWidth: 4
+TabWidth: 4
+UseTab: Never
+ColumnLimit: 100
+BreakBeforeBraces: Allman        # { 另起一行，嵌入式常见风格
+AllowShortIfStatementsOnASingleLine: false
+AllowShortFunctionsOnASingleLine: false
+PointerAlignment: Right          # int *p
+AlignConsecutiveAssignments: true
+AlignConsecutiveDeclarations: true
+SortIncludes: true

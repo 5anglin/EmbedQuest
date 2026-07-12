@@ -1,0 +1,8 @@
+// 本仓库含"教学用"的故意错误示例，这里对已知的、有意为之的告警做抑制。
+// 第01章：故意演示未初始化变量的未定义行为
+uninitvar:*uninitialized_ub.c
+// cppcheck 找不到系统头文件时的噪声
+missingInclude
+missingIncludeSystem
+// cppcheck 内部报告项
+checkersReport
