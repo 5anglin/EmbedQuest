@@ -49,3 +49,8 @@
 19-arm-firmware-stm32/*.bin
 19-arm-firmware-stm32/*.hex
 19-arm-firmware-stm32/*.map
+
+# QEMU 示例构建产物
+20-qemu-cortex-m/*.o
+20-qemu-cortex-m/*.elf
+20-qemu-cortex-m/*.map

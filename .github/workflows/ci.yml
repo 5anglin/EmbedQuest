@@ -43,14 +43,14 @@ jobs:
                    --inline-suppr \
                    --suppressions-list=.cppcheck-suppressions \
                    --error-exitcode=1 \
-                   -i docs -i 19-arm-firmware-stm32 \
+                   -i docs -i 19-arm-firmware-stm32 -i 20-qemu-cortex-m \
                    .
 
       - name: clang-tidy (informational)
         continue-on-error: true
         run: |
           find . -path ./docs -prune -o -name '*.c' -print \
-            | grep -v 19-arm-firmware-stm32 \
+            | grep -v 19-arm-firmware-stm32 | grep -v 20-qemu-cortex-m \
             | while read -r f; do
                 echo "== $f =="
                 clang-tidy --config-file=18-code-quality/.clang-tidy "$f" -- -std=c11 -I"$(dirname "$f")" || true
@@ -80,3 +80,22 @@ jobs:
             19-arm-firmware-stm32/blinky.elf
             19-arm-firmware-stm32/blinky.bin
             19-arm-firmware-stm32/blinky.hex
+
+  # 4) 模拟器：用 QEMU 运行 Cortex-M 半主机示例并校验输出
+  run-in-qemu:
+    name: Run in QEMU (Cortex-M semihosting)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install ARM toolchain + QEMU
+        run: sudo apt-get update && sudo apt-get install -y gcc-arm-none-eabi qemu-system-arm
+
+      - name: Build QEMU example
+        run: make -C 20-qemu-cortex-m
+
+      - name: Run in QEMU and check output
+        run: |
+          out=$(timeout 30 make -s -C 20-qemu-cortex-m run || true)
+          echo "$out"
+          echo "$out" | grep -q "done" || { echo "QEMU 运行未看到预期输出"; exit 1; }
